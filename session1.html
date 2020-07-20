@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>My experiment</title>
+    <script src="jspsych-6.1.0/jspsych.js"></script>
+    <script src="jspsych-6.1.0/plugins/jspsych-image-button-response.js"></script>
+    <script src="jspsych-6.1.0/plugins/jspsych-html-keyboard-response.js"></script>
+    <script src="jspsych-6.1.0/plugins/jspsych-instructions.js"></script>
+    <script src="jspsych-6.1.0/plugins/jspsych-external-html.js"></script>
+    <script src="jspsych-6.1.0/plugins/jspsych-survey-text.js"></script>
+    <script src="jspsych-6.1.0/plugins/jspsych-survey-html-form.js"></script>
+    <script src="jspsych-6.1.0/plugins/jspsych-image-slider-response.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.0.min.js"></script> 
+    <script src="jspsych-6.1.0/plugins/jspsych-call-function.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.16.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.16.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.16.0/firebase-database.js"></script>
+    <link href="jspsych-6.1.0/css/jspsych.css" rel="stylesheet" type="text/css"></link>
+  </head>
+  <body style = "background-color:	#adadad;"></body>
+  <script type="text/javascript">
+    // Firebase set up
+    var firebaseConfig = {
+      apiKey: "AIzaSyAfKwhyGj3zMSKgls3AlSQAOdClv2fvx2Q",
+      authDomain: "category-learning-experiments.firebaseapp.com",
+      databaseURL: "https://category-learning-experiments.firebaseio.com",
+      projectId: "category-learning-experiments",
+      storageBucket: "category-learning-experiments.appspot.com",
+      messagingSenderId: "942614391973",
+      appId: "1:942614391973:web:0d0ac2f895cdb4ab59b14c"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+
+    // login anonymous user
+    firebase.auth().signInAnonymously().catch(function(error) {
+        var errorCode = error.code;
+        var errorMessage = error.message;
+    });
+  </script>
+
+  <script>
+    (async() => {
+      // ---------------------------------set variables --------------------------------------
+      // default subject id
+      var default_id = '001000'
+      // selected dimensions for flower stimuli
+      var flower_selected_dimensions = ['petal_counts', 'petal_colors', 'center_shapes', 'center_colors', 'septal_counts']
+      // selected dimensions for turtle stimuli
+      var turtle_selected_dimensions = ['leg_shapes', 'leg_colors', 'shell_shapes', 'head_shapes', 'spot_colors']
+      // set correctness threshold
+      var correct_threshold = 0.50
+      // number of learning trials
+      var learning_num = 2
+      // number of test1 trials
+      var test1_num = 3
+      // maximum repetitions
+      var max_repeat = 3
+      // waiting period (in second)
+      var waiting_time = 1
+      // question for flowers
+      var flower_question = "<br>Is this an avolnia?"
+      // questions for turtles
+      var turtle_question = "<br>Is this a cordies?"
+      // overview
+      var overview = "Welcome to the experiment. This study involves two sessions.<br>\
+                    You will complete the first session today and the second session a week later.<br>\
+                    The first session consists of two blocks, each with a learning and a test phases.<br>"
+      // instructions for starting trials
+      var start_trial = "Once finishing reading the instructions, please press 'Next' to start the trials.<br>"
+      // instructions for feedback
+      var feedback_ins = "You will receive feedback after responding to an image.<br>"
+      // instructions for completing learning phase
+      var learning_complete = "You have completed the learning phase.<br>\
+                              The test phase will start in 90 seconds.<br>" // *****************Question here
+      // instructions for completing test phase for block1
+      var test_complete = "You have completed the test phase for Block 1.<br>\
+                          The learning phase of Block 2 will start in 90 seconds.<br>"
+      // instructions for completing test phase for block1
+      var session_complete = "You have completed the first session of the experiment.<br>\
+                          Please [do something].<br>"
+      // instructions for block1
+      var ins_block_1 = "For the Block 1"
+      // instruction1 for block2
+      var ins_block_2 = "For the Block 2"
+      // learning instructions (flower)
+      var leaning_ins_f = "you will see images of flowers on the screen.<br>\
+                          You will determine whether each flower belongs to the species avolnia or not.<br>\
+                          Press 'Yes' if you think the flower is avolnia and 'No' if you think it is not.<br>\
+                          Please make your responses as fast and accurately as possible.<br>"
+      // learning instructions (turtle)
+      var leaning_ins_t = "you will see images of turtles on the screen.<br>\
+                          You will determine whether each turtle belongs to the species cordies or not.<br>\
+                          Press 'Yes' if you think the turtle is cordies and 'No' if you think it is not.<br>\
+                          Please make your responses as fast and accurately as possible.<br>"
+      // general test1 instructions
+      var test1_ins_general = "you will complete two tasks.<br>\
+                              The first is a categorizationt task that similar to the one you have completed in the learning phase.<br>\
+                              The second is a recognition task.<br>"
+      // test1_instrcutions (recognition)
+      var test1_ins_recognition = "For the recognition task, you will judge whether you have seen each image previously using a scale.<br>\
+                                  The scale consists of 4 points: Old, Maybe Old, Maybe New, and New.<br>\
+                                  At one end, 'Old' means that you certainly remember seeing the image previously.<br>\
+                                  At the other end, 'New' means that you don't remember the image at all.<br>\
+                                  Please make your responses as fast and accurately as possible.<br>"
+
+      // ---------------------------------fixed variables --------------------------------------
+      // properties of flower stimuli
+      var flower_arr = {
+        'petal_styles': ['pointed', 'concave', 'round'],
+        'petal_counts': [4, 6, 2, 8],
+        'petal_colors': ['blue', 'yellow', 'green', 'red'],
+        'center_shapes':  ['circle', 'triangle', 'square','star'],
+        'center_colors': ['purple', 'orange', 'lightblue', 'bluegreen'],
+        'septal_counts': [0, 1, 2, 3]
+        }
+      // flower stimuli title 
+      var flower_title = 'stim'
+      // properties of turtle stimuli
+      var turtle_arr = {
+        'shell_shapes': ['circle', 'box','triangle','octagon'],
+        'spot_counts': [0, 1, 2, 3],
+        'spot_colors': ['purple', 'orange', 'brightgreen', 'lightblue'],
+        'head_shapes':  ['circle', 'triangle','diamond','trapezoid'],
+        'tail': ['left', 'right'],
+        'leg_shapes': ['fin', 'turtle', 'tortoise','semicircle'],
+        'leg_colors': ['blue', 'pink', 'yellow', 'green']
+      }
+      // flower stimuli title 
+      var turtle_title = 'turtle'
+      // counter variables
+      var [l_count, t_count, repetition_count, total_count, total_correct, percent_correct] = [0, 0, 0, 0, 0, 0]
+      // timeline
+      var timeline = []
+      // mutable timeline
+      var mut_timeline = []
+      // countdown timer
+      var count_down = waiting_time
+      // time_variables array for learning trials
+      var learning_trials = [] // number of learning trials
+      for (let t = 0; t < learning_num; t ++) {
+        learning_trials.push({});
+      }
+      // time_variables array for test1 trials
+      var test1_trials = [] // number of test trials
+      for (let t = 0; t < test1_num; t ++) {
+        test1_trials.push({});
+      }
+// ---------------------------------preload images --------------------------------------    
+      function extractEssentialProperty(arr, selected_dim) {
+        var result = [];
+        for (key in arr) {
+          if (selected_dim.includes(key)) {
+            if (selected_dim[4].includes(key)) {
+              result.push([arr[key][0], arr[key][1]]);
+            } else {
+              result.push(arr[key]);
+            };
+          } else {
+            result.push([arr[key][1]]);
+          };
+        };
+        return result;
+      }
+
+      function allPossibleCases(arr) {
+        if (arr.length == 1) {
+          return arr[0];
+        } else {
+          var result = [];
+          var allCasesOfRest = allPossibleCases(arr.slice(1));  // recur with the rest of array
+          for (var i = 0; i < allCasesOfRest.length; i++) {
+            for (var j = 0; j < arr[0].length; j++) {
+              result.push(arr[0][j] + '_' + allCasesOfRest[i]);
+            }
+          }
+          return result;
+        }
+      }
+      var images = []
+      var a = allPossibleCases(extractEssentialProperty(flower_arr, flower_selected_dimensions))
+      var b = allPossibleCases(extractEssentialProperty(turtle_arr, turtle_selected_dimensions))
+      for (item in a) {
+        images.push("flowers/flowers/images/stim_" + a[item] + '.png')
+      }
+      for (item in b) {
+        images.push("turtles/turtles/images/turtle_" + b[item] + '.png')
+      }
+
+// ---------------------------------generate stimulus array --------------------------------------
+      async function generate_stimulus_array(sequence, image, session){
+        // set relevant variables
+        var feature_arr = (image == 0) ? flower_arr : turtle_arr;
+        var stimulus_title = (image == 0) ? "stim" : "turtle";
+        var all_dimensions = Object.keys(feature_arr);
+        var selected_dimensions = (image == 0) ? flower_selected_dimensions : turtle_selected_dimensions;
+        var [all_dimensions_dict, remain_dimension] = [{}, []];
+        // generate dimension array
+        for (let x = 0; x < all_dimensions.length; x ++){
+          all_dimensions_dict[all_dimensions[x]] = null;
+          if (selected_dimensions.includes(all_dimensions[x]) == false){
+            remain_dimension.push(all_dimensions[x]);
+          };
+        };
+        const getJSON = url =>
+          new Promise(res => $.getJSON(url, res));
+          const stm_json = await getJSON('sq_' + sequence + '/' + session + '_' + sequence + '.json');
+        var [stimuli, line, stm_property] = [[], [], []];
+        for (let x = 0; x < stm_json.length; x ++){
+          line = stm_json[x];
+          stm_property = [];
+          for (let x = 0; x < selected_dimensions.length; x++){
+            all_dimensions_dict[selected_dimensions[x]] = feature_arr[selected_dimensions[x]][Object.values(line)[x]-1];
+            stm_property.push(all_dimensions_dict[selected_dimensions[x]]);
+          };
+          if (remain_dimension.length > 0) {
+            for (let x = 0; x < remain_dimension.length; x++){
+              all_dimensions_dict[remain_dimension[x]] = feature_arr[remain_dimension[x]][1];
+            };
+          }; 
+          var s = '';
+          for (let x = 0; x < all_dimensions.length; x++){
+            s += '_' + Object.values(all_dimensions_dict)[x];
+          };
+          s = stimulus_title + s + '.png';
+          stimuli.push({
+            image_file: s, 
+            image_property: stm_property, 
+            image_number: Object.values(line)[5], 
+            image_type: Object.values(line)[6], 
+            image_phase: Object.values(line)[7]})
+        };
+        return stimuli;
+      }
+
+// ---------------------------------initialize --------------------------------------
+      // consent form
+      var check_consent = function(elem) {
+        if (document.getElementById('consent_checkbox').checked) {
+          return true;
+        }
+        else {
+          alert("If you wish to participate, you must check the box next to the statement 'I agree to participate in this study.'");
+          return false;
+        }
+        return false;
+      };
+      var draw_consent = {
+        type:'external-html',
+        url: "consent.html",
+        cont_btn: "start",
+        check_fn: check_consent
+      }
+      // begin learning
+      var initial_questions = {
+        type:'survey-text',
+        questions: [{prompt: "Subject ID", name: "subject_id"}],
+        // Subject ID = subject number + trial sequence + image order + problem order
+        // subject number: 001 ~ 999
+        // trial sequence: 1 ~ 6
+        // image order: 0 = flower first; 1 = turtle first
+        // problem order: 0 = type 1 first; 1 = type2 first
+        // ex. 001000 = subject#1, sequence#0, flower -> turtle, type1 -> type2
+        data: {
+          subject: null, 
+          trial_sequence: null, 
+          img_b1: null, 
+          img_b2: null, 
+          problem_b1: null, 
+          problem_b2: null,
+          stm_learn_b1: null,
+          stm_learn_b2: null,
+          stm_test1_b1: null,
+          stm_test1_b2: null
+          },
+        on_finish: async function(data) {
+          var subject_info = JSON.parse(data.responses).subject_id;
+          if (subject_info == '') {
+            subject_info = default_id;
+          };
+          data.subject = subject_info.substring(0, 3);
+          data.trial_sequence = subject_info[3];
+          data.img_b1 = subject_info[4];
+          data.img_b2 = Math.abs(subject_info[4] - 1);
+          data.problem_b1 = subject_info[5];
+          data.problem_b2 = Math.abs(subject_info[5] - 1);
+          data.stm_learn_b1 = await generate_stimulus_array(subject_info[3], subject_info[4], 'learning');
+          data.stm_learn_b2 = await generate_stimulus_array(subject_info[3], Math.abs(subject_info[4] - 1), 'learning'); 
+          data.stm_test1_b1 = await generate_stimulus_array(subject_info[3], subject_info[4], 'test1');
+          data.stm_test1_b2 = await generate_stimulus_array(subject_info[3], Math.abs(subject_info[4] - 1), 'test1');
+        }
+      }
+      // ---------------------------     
+      timeline.push(draw_consent)
+      timeline.push(initial_questions)
+      mut_timeline.push('draw_consent', 'initial_questions')
+
+// ---------------------------------create learning trials for block 1 --------------------------------------
+      // draw instructions for block1 learning
+      var draw_learning_ins_b1 = {
+        type: 'instructions',
+        pages: function(){
+          console.log(jsPsych.data.get().first(2).values()[1]);
+          var i = (jsPsych.data.get().first(2).values()[1].img_b1 == 0)? leaning_ins_f : leaning_ins_t;
+          return [overview, (ins_block_1 + " learning phase, " + i + feedback_ins), start_trial];
+        },
+        show_clickable_nav: true,
+        show_page_number: true
+      }
+      // draw fixation cross
+      var draw_fixation = {
+        type: 'html-keyboard-response',
+        stimulus: '+',
+        choices: jsPsych.NO_KEYS,
+        trial_duration: 1200
+      }
+      // draw images for block1 - learning  ****************************complete prompt
+      var draw_image_learn_b1 = {
+        type: 'image-button-response',
+        stimulus: function(){ // draw image
+          console.log('learning trial:', (l_count + 1));
+          var img_name = (jsPsych.data.get().first(2).values()[1].img_b1 == 0) ? "flowers/flowers/images/" : "turtles/turtles/images/";
+          return (img_name + jsPsych.data.get().first(2).values()[1].stm_learn_b1[l_count]['image_file']);
+        },
+        choices: ['Yes', 'No'],
+        prompt: function(){
+          return (jsPsych.data.get().first(2).values()[1].img_b1 == 0) ? flower_question : turtle_question;
+        },
+        data: {
+          number: '',
+          property: '',
+          type: '',
+          phase: ''
+        },
+        on_finish: function(data){
+          data.type = jsPsych.data.get().first(2).values()[1].stm_learn_b1[l_count]['image_type'];
+          data.number = jsPsych.data.get().first(2).values()[1].stm_learn_b1[l_count]['image_number'];
+          data.property = jsPsych.data.get().first(2).values()[1].stm_learn_b1[l_count]['image_property'];
+          data.phase = jsPsych.data.get().first(2).values()[1].stm_learn_b1[l_count]['image_phase'];
+          if (jsPsych.data.get().first(2).values()[1].problem_b1 == 0) { // if type1 problem
+            data.correct = (data.button_pressed == 0) ? (['t1', 'b'].includes(data.type)) : (['t2', 'n'].includes(data.type));
+          } else { // if type2 problem
+            data.correct = (data.button_pressed == 0) ? (['t2', 'b'].includes(data.type)) : (['t1', 'n'].includes(data.type));
+          };
+          l_count += 1;
+          total_count += 1;
+        }
+      }
+      // draw feedback
+      var draw_feedback = {
+        type: 'html-keyboard-response',
+        choices: jsPsych.NO_KEYS,
+        stimulus: function(){
+          if(jsPsych.data.get().last(1).values()[0].correct) total_correct += 1;
+          console.log('total correctness:', total_correct);
+          return (jsPsych.data.get().last(1).values()[0].correct)? "<p>Correct</p>" : "<p>Incorrect</p>"; 
+        },
+        trial_duration: 1200
+      }
+      // draw learning trials for block 1 
+      var learning_block_1 = {
+        timeline: [draw_fixation, draw_image_learn_b1, draw_feedback],
+        timeline_variables: learning_trials
+      }
+      // loop learning trials for block 1
+      var learning_loop_block_1 = {
+        timeline: [learning_block_1],
+        loop_function: function(data){
+          l_count = 0;
+          percent_correct = total_correct / total_count;
+          console.log('percent_correct:', percent_correct);
+          console.log('repetition:', (repetition_count + 1));
+          if (percent_correct < correct_threshold){ 
+            console.log('Did not achieve 50% correctness!');
+            if(repetition_count >= (max_repeat - 1)){ // if repeated trials n times, break loop
+              [total_correct, total_count, repetition_count, t_count] = [0,0,0,0];
+              return false;
+            } else {
+              repetition_count += 1;
+              return true;
+            };
+          } else { // if achieved 80% correctness, break loop
+            console.log('Achieved 50% correctness!');
+            [total_correct, total_count, repetition_count, t_count] = [0,0,0,0];
+            return false;
+          };
+        }
+      }   
+      // end block1 learning
+      var draw_end_learning = {
+        type: 'html-keyboard-response',
+        choices: jsPsych.NO_KEYS,
+        stimulus: learning_complete,
+        trial_duration: 1200
+      }
+      // draw timer
+      var timer_start = {
+        type: 'html-keyboard-response',
+        choices: jsPsych.NO_KEYS,
+        stimulus: function(){
+          return count_down;
+        },
+        trial_duration: 1000 // ms
+      }
+      var timer_loop = {
+        timeline: [timer_start],
+        loop_function: function(){
+        if (count_down == 0) {
+          count_down = waiting_time;
+          return false;
+        } else {
+          count_down -= 1;
+          return true;
+        };
+      }
+    }
+      // ---------------------------
+      timeline.push(draw_learning_ins_b1)
+      timeline.push(learning_loop_block_1)
+      // timeline.push(draw_end_learning)
+      // timeline.push(timer_loop)
+      mut_timeline.push('draw_learning_ins_b1', 'learning_loop_block_1')
+
+// ---------------------------------create test1 trials for block 1 --------------------------------------
+      // draw insturctions for block1 test
+      var draw_test_ins_b1 = Object.assign({}, draw_learning_ins_b1)
+      draw_test_ins_b1.pages = function(){
+        var i = (jsPsych.data.get().first(2).values()[1].img_b1 == 0)? leaning_ins_f : leaning_ins_t;
+        return [(ins_block_1 + " test phase, " + i), start_trial];
+      }
+      // draw images for block1 - test1 - categorization
+      var draw_image_test_b1_c = Object.assign({}, draw_image_learn_b1)
+      draw_image_test_b1_c.stimulus = function(){ // draw image
+        console.log('test1 trial:', (t_count + 1));
+        var img_name = (jsPsych.data.get().first(2).values()[1].img_b1 == 0) ? "flowers/flowers/images/" : "turtles/turtles/images/";
+        return (img_name + jsPsych.data.get().first(2).values()[1].stm_test1_b1[t_count]['image_file']);
+      }
+      draw_image_test_b1_c.on_finish = function(data){
+          data.type = jsPsych.data.get().first(2).values()[1].stm_test1_b1[l_count]['image_type'];
+          data.number = jsPsych.data.get().first(2).values()[1].stm_test1_b1[l_count]['image_number'];
+          data.property = jsPsych.data.get().first(2).values()[1].stm_test1_b1[l_count]['image_property'];
+          data.phase = jsPsych.data.get().first(2).values()[1].stm_test1_b1[l_count]['image_phase'];
+          if (jsPsych.data.get().first(2).values()[1].problem_b1 == 0) { // if type1 problem
+            data.correct = (data.button_pressed == 0) ? (['t1', 'b'].includes(data.type)) : (['t2', 'n'].includes(data.type));
+          } else { // if type2 problem
+            data.correct = (data.button_pressed == 0) ? (['t2', 'b'].includes(data.type)) : (['t1', 'n'].includes(data.type));
+          };
+        }
+      // draw images for block1 - recognition
+      var draw_image_test_b1_r = {
+        type: 'image-slider-response',
+        stimulus: function(){ // draw image
+          var img_name = (jsPsych.data.get().first(2).values()[1].img_b1 == 0) ? "flowers/flowers/images/" : "turtles/turtles/images/";
+          return (img_name + jsPsych.data.get().first(2).values()[1].stm_test1_b1[t_count]['image_file']);
+        },
+        labels: ['1<br>Old', '2<br>Maybe Old', '3<br>Maybe new', '4<br>New'],
+        min: 1,
+        max: 4,
+        start: 1,
+        on_finish: function(data){
+          data.type = jsPsych.data.get().first(2).values()[1].stm_test1_b1[l_count]['image_type'];
+          data.number = jsPsych.data.get().first(2).values()[1].stm_test1_b1[l_count]['image_number'];
+          data.property = jsPsych.data.get().first(2).values()[1].stm_test1_b1[l_count]['image_property'];
+          data.phase = jsPsych.data.get().first(2).values()[1].stm_test1_b1[l_count]['image_phase'];
+          data.correct = (data.response > 2)? (data.phase == 'LP') : (data.phase != 'LP');
+          t_count += 1;
+          console.log('correct:', data.correct);
+          }
+      }
+      // draw test1 trials for block 1 
+      var test1_block_1 = {
+        timeline: [draw_fixation, draw_image_test_b1_c, draw_image_test_b1_r],
+        timeline_variables: test1_trials
+      }
+      // end block1 test
+      var draw_end_test = {
+        type: 'html-keyboard-response',
+        choices: jsPsych.NO_KEYS,
+        stimulus: test_complete,
+        trial_duration: 1200
+      }
+      // ---------------------------
+      // timeline.push(draw_test_ins_b1)
+      timeline.push(test1_block_1)
+      // timeline.push(draw_end_test)
+      // timeline.push(timer_loop)
+      mut_timeline.push('test1_block_1')
+
+// ---------------------------------create learning trials for block 2 --------------------------------------
+      // draw instructions for block2 learning
+      var draw_learning_ins_b2 = {
+        type: 'instructions',
+        pages: function(){
+          var i = (jsPsych.data.get().first(2).values()[1].img_b2 == 0)? leaning_ins_f : leaning_ins_t;
+          return [(ins_block_2 + " learning phase, " + i + feedback_ins), start_trial];
+        },
+        show_clickable_nav: true,
+        show_page_number: true
+      }  
+      // draw images for block2 - learning
+      var draw_image_learn_b2 = Object.assign({}, draw_image_learn_b1)
+      draw_image_learn_b2.stimulus = function(){ // draw image
+          console.log('learning trial:', (l_count + 1));
+          var img_name = (jsPsych.data.get().first(2).values()[1].img_b2 == 0) ? "flowers/flowers/images/" : "turtles/turtles/images/";
+          return (img_name + jsPsych.data.get().first(2).values()[1].stm_learn_b2[l_count]['image_file']);
+        }
+      draw_image_learn_b2.prompt = function(){
+        return (jsPsych.data.get().first(2).values()[1].img_b2 == 0) ? flower_question : turtle_question;
+      }
+      draw_image_learn_b2.on_finish = function(data){
+          data.type = jsPsych.data.get().first(2).values()[1].stm_learn_b2[l_count]['image_type'];
+          data.number = jsPsych.data.get().first(2).values()[1].stm_learn_b2[l_count]['image_number'];
+          data.property = jsPsych.data.get().first(2).values()[1].stm_learn_b2[l_count]['image_property'];
+          data.phase = jsPsych.data.get().first(2).values()[1].stm_learn_b2[l_count]['image_phase'];
+          if (jsPsych.data.get().first(2).values()[1].problem_b2 == 0) { // if type1 problem
+            data.correct = (data.button_pressed == 0) ? (['t1', 'b'].includes(data.type)) : (['t2', 'n'].includes(data.type));
+          } else { // if type2 problem
+            data.correct = (data.button_pressed == 0) ? (['t2', 'b'].includes(data.type)) : (['t1', 'n'].includes(data.type));
+          };
+          l_count += 1;
+          total_count += 1;
+        }
+      // draw learning trials for block 2
+      var learning_block_2 = {
+        timeline: [draw_fixation, draw_image_learn_b2, draw_feedback],
+        timeline_variables: learning_trials
+      }
+      // loop learning trials for block 2
+      var learning_loop_block_2 = Object.assign({}, learning_loop_block_1)
+      learning_loop_block_2.timeline = [learning_block_2]
+      // ---------------------------
+      // timeline.push(draw_learning_ins_b2)
+      timeline.push(learning_loop_block_2)
+      // timeline.push(draw_end_learning)
+      // timeline.push(timer_loop)
+      mut_timeline.push('learning_loop_block_2')
+
+// ---------------------------------create test1 trials for block 2 --------------------------------------
+      // draw insturctions for block2 test
+      var draw_test_ins_b2 = Object.assign({}, draw_learning_ins_b1)
+      draw_test_ins_b2.pages = function(){
+        var i = (jsPsych.data.get().first(2).values()[1].img_b2 == 0)? leaning_ins_f : leaning_ins_t;
+        return [(ins_block_2 + " test phase, " + i), start_trial];
+      }
+      // draw images for block2 - test1 - categorization
+      var draw_image_test_b2_c = Object.assign({}, draw_image_learn_b2)
+      draw_image_test_b2_c.stimulus = function(){ // draw image
+        console.log('test1 trial:', (t_count + 1));
+        var img_name = (jsPsych.data.get().first(2).values()[1].img_b2 == 0) ? "flowers/flowers/images/" : "turtles/turtles/images/";
+        return (img_name + jsPsych.data.get().first(2).values()[1].stm_test1_b2[t_count]['image_file']);
+      }
+      draw_image_test_b2_c.on_finish = function(data){
+        data.type = jsPsych.data.get().first(2).values()[1].stm_test1_b2[l_count]['image_type'];
+        data.number = jsPsych.data.get().first(2).values()[1].stm_test1_b2[l_count]['image_number'];
+        data.property = jsPsych.data.get().first(2).values()[1].stm_test1_b2[l_count]['image_property'];
+        data.phase = jsPsych.data.get().first(2).values()[1].stm_test1_b2[l_count]['image_phase'];
+        if (jsPsych.data.get().first(2).values()[1].problem_b2 == 0) { // if type1 problem
+          data.correct = (data.button_pressed == 0) ? (['t1', 'b'].includes(data.type)) : (['t2', 'n'].includes(data.type));
+        } else { // if type2 problem
+          data.correct = (data.button_pressed == 0) ? (['t2', 'b'].includes(data.type)) : (['t1', 'n'].includes(data.type));
+        };
+      }
+      // draw images for block2 - recognition
+      var draw_image_test_b2_r = Object.assign({}, draw_image_test_b1_r)
+      draw_image_test_b2_r.stimulus = function(){ // draw image
+        var img_name = (jsPsych.data.get().first(2).values()[1].img_b2 == 0) ? "flowers/flowers/images/" : "turtles/turtles/images/";
+        return (img_name + jsPsych.data.get().first(2).values()[1].stm_test1_b2[t_count]['image_file']);
+      }
+      draw_image_test_b2_r.on_finish = function(data){
+        data.type = jsPsych.data.get().first(2).values()[1].stm_test1_b2[l_count]['image_type'];
+        data.number = jsPsych.data.get().first(2).values()[1].stm_test1_b2[l_count]['image_number'];
+        data.property = jsPsych.data.get().first(2).values()[1].stm_test1_b2[l_count]['image_property'];
+        data.phase = jsPsych.data.get().first(2).values()[1].stm_test1_b2[l_count]['image_phase'];
+        data.correct = (data.response > 2)? (data.phase == 'LP') : (data.phase != 'LP');
+        t_count += 1;
+        console.log('correct:', data.correct);
+      }
+      // draw test1 trials for block 2 
+      var test1_block_2 = {
+        timeline: [draw_fixation, draw_image_test_b2_c, draw_image_test_b2_r],
+        timeline_variables: test1_trials
+      }
+      // draw instruction for the end of session
+      var draw_end_session = {
+        type: 'html-keyboard-response',
+        choices: jsPsych.NO_KEYS,
+        stimulus: session_complete,
+        trial_duration: 1200
+      }
+      // ---------------------------
+      // timeline.push(draw_test_ins_b2)
+      timeline.push(test1_block_2)
+      // timeline.push(draw_end_session)
+      mut_timeline.push('test1_block_2')
+
+// ---------------------------------create surveys --------------------------------------
+      var draw_general_questions = {
+        type: 'survey-html-form',
+        html: '<p style="text-align:left;">\
+          1. How old are you? <input name="age" type="number" min="8" max="100"/>\
+          2. What is your gender?\
+          <input type="radio" id="male" name="gender" value="male"/>\
+          <label for="male">Male</label><br>\
+          <input type="radio" id="female" name="gender" value="female"/>\
+          <label for="female">Female</label><br>\
+          <input type="radio" id="other" name="gender" value="other"/>\
+          <label for="other">Other</label><br>\
+          3. Are you left- or right- handed?\
+          <input type="radio" id="left" name="handedness" value="left"/>\
+          <label for="left">Left</label><br>\
+          <input type="radio" id="right" name="handedness" value="right"/>\
+          <label for="right">Right</label><br>\
+          <input type="radio" id="both" name="handedness" value="both"/>\
+          <label for="both">Both</label>\
+          4. What is your ethnicity? Please select ALL that apply.\
+          <input type="checkbox" id="Caucasian" name="ethnicity" value="Caucasian"/>\
+          <label for="Caucasian">Caucasian</label><br>\
+          <input type="checkbox" id="Latino/Hispanic" name="ethnicity" value="Latino/Hispanic"/>\
+          <label for="Latino/Hispanic">Latino/Hispanic</label><br>\
+          <input type="checkbox" id="Middle Eastern" name="ethnicity" value="Middle Eastern"/>\
+          <label for="Middle Eastern">Middle Eastern</label><br>\
+          <input type="checkbox" id="African" name="ethnicity" value="African"/>\
+          <label for="African">African</label><br>\
+          <input type="checkbox" id="Caribbean" name="ethnicity" value="Caribbean"/>\
+          <label for="Caribbean">Caribbean</label><br>\
+          <input type="checkbox" id="South Asia" name="ethnicity" value="South Asia"/>\
+          <label for="South Asia">South Asia</label><br>\
+          <input type="checkbox" id="East Asia" name="ethnicity" value="East Asia"/>\
+          <label for="East Asia">East Asia</label><br>\
+          <input type="checkbox" id="Other" name="ethnicity" value="Other"/>\
+          <label for="Other">Other</label><br>\
+          5. Do you currently have any vision problems? If so, is your vision corrected (ex. via glasses, contact lenses)?\
+          <input type="radio" id="healthy" name="vision" value="healthy"/>\
+          <label for="healthy">I do not have any vision problems</label><br>\
+          <input type="radio" id="corrected" name="vision" value="corrected"/>\
+          <label for="corrected">I have vision problems, and my vision is corrected</label><br>\
+          <input type="radio" id="uncorrected" name="vision" value="uncorrected"/>\
+          <label for="uncorrected">I have vision problems, and my vision is NOT corrected</label>\
+          6. Are you currently taking any medications that affect your sleep, memory, or learning?\
+          <input type="radio" id="yes" name="medication use" value="yes"/>\
+          <label for="yes">Yes</label><br>\
+          <input type="radio" id="no" name="medication use" value="no"/>\
+          <label for="no">No</label><br>\
+          7. Are you in any medical conditions (ex. epilepsy, traumatic brain injury, ADHD) that affect your sleep, memory, or learning?\
+          <input type="radio" id="yes" name="medical condition" value="yes"/>\
+          <label for="yes">Yes</label><br>\
+          <input type="radio" id="no" name="medical condition" value="no"/>\
+          <label for="no">No</label><br>\
+          8. Do you have color blindness?\
+          <input type="radio" id="yes" name="color blindness" value="yes"/>\
+          <label for="yes">Yes</label><br>\
+          <input type="radio" id="no" name="color blindness" value="no"/>\
+          <label for="no">No</label><br>\
+          </p>'
+      };
+      var draw_SMHSQ_questions = {
+        type: 'survey-html-form',
+        html: '<p style="text-align:left;">\
+          1. At what time did you settle down for the night? <input type="time" name="settle-down time"/>\
+          2. At what time did you fall asleep last night? <input type="time" name="fall-asleep time"/>\
+          3. At what time did you finally wake this morning? <input type="time" name="wake-up time"/>\
+          4. At what time did you get up this morning? <input type="time" name="get-up time"/>\
+          5. Was your sleep:\
+          <input type="radio" id="very light" name="depth of sleep" value="very light"/>\
+          <label for="very light">very light</label><br>\
+          <input type="radio" id="light" name="depth of sleep" value="light"/>\
+          <label for="light">light</label><br>\
+          <input type="radio" id="fairly light" name="depth of sleep" value="fairly light"/>\
+          <label for="fairly light">fairly light</label><br>\
+          <input type="radio" id="light average" name="depth of sleep" value="light average"/>\
+          <label for="light average">light average</label><br>\
+          <input type="radio" id="fairly deep" name="depth of sleep" value="fairly deep"/>\
+          <label for="fairly deep">fairly deep</label><br>\
+          <input type="radio" id="deep" name="depth of sleep" value="deep"/>\
+          <label for="deep">deep</label><br>\
+          <input type="radio" id="very deep" name="depth of sleep" value="very deep"/>\
+          <label for="very deep">very deep</label><br>\
+          6. How many times did you wake up?\
+          <input type="radio" id="Not at all" name="wake-up frequency" value="Not at all"/>\
+          <label for="Not at all">Not at all</label><br>\
+          <input type="radio" id="Once" name="wake-up frequency" value="Once"/>\
+          <label for="Once">Once</label><br>\
+          <input type="radio" id="Twice" name="wake-up frequency" value="Twice"/>\
+          <label for="Twice">Twice</label><br>\
+          <input type="radio" id="Three times" name="wake-up frequency" value="Three times"/>\
+          <label for="Three times">Three times</label><br>\
+          <input type="radio" id="Four times" name="wake-up frequency" value="Four times"/>\
+          <label for="Four times">Four times</label><br>\
+          <input type="radio" id="Five times" name="wake-up frequency" value="Five times"/>\
+          <label for="Five times">Five times</label><br>\
+          <input type="radio" id="Six times" name="wake-up frequency" value="Six times"/>\
+          <label for="Six times">Six times</label><br>\
+          <input type="radio" id="More than six times" name="wake-up frequency" value="More than six times"/>\
+          <label for="More than six times">More than six times</label><br>\
+          7. How much sleep did you have last night?<br>\
+          Hrs.: <input type="number" name="sleep amount at night - hrs"/><br>\
+          Mins.: <input type="number" name="sleep amount at night - mins"/><br>\
+          8. How much sleep did you have during the day, yesterday?<br>\
+          Hrs.: <input type="number" name="sleep amount in day - hrs"/><br>\
+          Mins.: <input type="number" name="sleep amount in day - mins"/><br>\
+          9. How well did you sleep last night?\
+          <input type="radio" id="Very badly" name="feeling of sleep" value="Very badly"/>\
+          <label for="Very badly">Very badly</label><br>\
+          <input type="radio" id="Badly" name="sleep satisfaction" value="Badly"/>\
+          <label for="Badly">Badly</label><br>\
+          <input type="radio" id="Fairly badly" name="sleep satisfaction" value="Fairly badly"/>\
+          <label for="Fairly badly">Fairly badly</label><br>\
+          <input type="radio" id="Fairly well" name="sleep satisfaction" value="Fairly well"/>\
+          <label for="Fairly well">Fairly well</label><br>\
+          <input type="radio" id="Well" name="sleep satisfaction" value="Well"/>\
+          <label for="Well">Well</label><br>\
+          <input type="radio" id="Very well" name="sleep satisfaction" value="Very well"/>\
+          <label for="Very well">Very well</label><br>\
+          10. How clear-headed did you feel after getting up this morning?\
+          <input type="radio" id="Still very drowsy indeed" name="clear-headedness" value="Still very drowsy indeed"/>\
+          <label for="Still very drowsy indeed">Still very drowsy indeed</label><br>\
+          <input type="radio" id="Still moderately drowsy" name="clear-headedness" value="Still moderately drowsy"/>\
+          <label for="Still moderately drowsy">Still very moderately drowsy</label><br>\
+          <input type="radio" id="Still slightly drowsy" name="clear-headedness" value="Still slightly drowsy"/>\
+          <label for="Still slightly drowsy">Still very slightly drowsy</label><br>\
+          <input type="radio" id="Fairly clear-headed" name="clear-headedness" value="Fairly clear-headed"/>\
+          <label for="Fairly clear-headed">Fairly clear-headed</label><br>\
+          <input type="radio" id="Alert" name="clear-headedness" value="Alert"/>\
+          <label for="Alert">Alert</label><br>\
+          <input type="radio" id="Very alert" name="clear-headedness" value="Very alert"/>\
+          <label for="Very alert">Very alert</label><br>\
+          11. How satisfied were you with last night\'s sleep?\
+          <input type="radio" id="Very unsatisfied" name="sleep satisfaction" value="Very unsatisfied"/>\
+          <label for="Very unsatisfied">Very unsatisfied</label><br>\
+          <input type="radio" id="Moderately unsatisfied" name="sleep satisfaction" value="Moderately unsatisfied"/>\
+          <label for="Moderately unsatisfied">Moderately unsatisfied</label><br>\
+          <input type="radio" id="Slightly unsatisfied" name="sleep satisfaction" value="Slightly unsatisfied"/>\
+          <label for="Slightly unsatisfied">Slightly unsatisfied</label><br>\
+          <input type="radio" id="Fairly satisfied" name="sleep satisfaction" value="Fairly satisfied"/>\
+          <label for="Fairly satisfied">Fairly satisfied</label><br>\
+          <input type="radio" id="Completely  satisfied" name="sleep satisfaction" value="Completely  satisfied"/>\
+          <label for="Completely  satisfied">Completely  satisfied</label><br>\
+          12. Were you troubled by waking early and being unable to get off to sleep again?\
+          <input type="radio" id="Yes" name="early wake-up" value="Yes"/>\
+          <label for="Yes">Yes</label><br>\
+          <input type="radio" id="No" name="early wake-up" value="No"/>\
+          <label for="No">No</label><br>\
+          13. How much difficulty did you have in getting off to sleep last night?\
+          <input type="radio" id="None or very little" name="sleep difficulty" value="None or very little"/>\
+          <label for="None or very little">None or very little</label><br>\
+          <input type="radio" id="Some" name="sleep difficulty" value="Some"/>\
+          <label for="Some">Some</label><br>\
+          <input type="radio" id="A lot" name="sleep difficulty" value="A lot"/>\
+          <label for="A lot">A lot</label><br>\
+          <input type="radio" id="Extreme difficulty" name="sleep difficulty" value="Extreme difficulty"/>\
+          <label for="Extreme difficulty">Extreme difficulty</label><br>\
+          14. How long did it take you to fall asleep last night?<br>\
+          Hrs.: <input type="number" name="hrs took to sleep"/><br>\
+          Mins.: <input type="number" name="mins took to sleep"/>\
+        </p>'
+      };
+      timeline.push(draw_general_questions)
+      // ---------------------------------end experiment --------------------------------------
+      jsPsych.init({
+        timeline: timeline,
+        preload_images: images,
+        on_finish: function() {
+          var subject_information = jsPsych.data.get().filter([{trial_type: 'survey-html-form'}, {trial_type: 'survey-text'}]);
+          var responses = jsPsych.data.get().filter([{trial_type: 'image-button-response'}, {trial_type: 'image-slider-response'}]);
+          // organize data for learning - block 1
+          var learning_data_b1 = responses.filterCustom(function(x){
+            return x.internal_node_id.substring(0, 7) == ("0.0-" + mut_timeline.indexOf('learning_loop_block_1') + ".0");
+          });
+          learning_data_b1 = {'phase': 'learning-B1', 'data': learning_data_b1.values()};
+          // organize data for test - block 1
+          var test_data_b1 = responses.filterCustom(function(x){
+            return x.internal_node_id.substring(0, 7) == ("0.0-" + mut_timeline.indexOf('test1_block_1') + ".0");;
+          });
+          test_data_b1 = {
+            'phase': 'test1-B1',
+            'categorization': test_data_b1.filter({trial_type: 'image-button-response'}).values(),
+            'recognition': test_data_b1.filter({trial_type: 'image-slider-response'}).values()
+            };
+          // organize data for learning - block 2
+          var learning_data_b2 = responses.filterCustom(function(x){
+            return x.internal_node_id.substring(0, 7) == ("0.0-" + mut_timeline.indexOf('learning_loop_block_2') + ".0");
+          });
+          learning_data_b2 = {'phase': 'learning-B2', 'data': learning_data_b2.values()};
+          // organize data for test - block 2
+          var test_data_b2 = responses.filterCustom(function(x){
+            return x.internal_node_id.substring(0, 7) == ("0.0-" + mut_timeline.indexOf('test1_block_2') + ".0");;
+          });
+          test_data_b2 = {
+            'phase': 'test1-B2',
+            'categorization': test_data_b2.filter({trial_type: 'image-button-response'}).values(),
+            'recognition': test_data_b2.filter({trial_type: 'image-slider-response'}).values()
+            };
+          console.log(learning_data_b1)
+          console.log(test_data_b1);
+          console.log(learning_data_b2);
+          console.log(test_data_b2);
+          // jsPsych.data.displayData();
+          var tmp = new Uint32Array(1);
+            tmp = window.crypto.getRandomValues(tmp)
+            var dbpath = firebase.auth().currentUser.uid+'/'+tmp;
+            firebase.database().ref(dbpath).set({
+                data: [
+                    subject_information,
+                    learning_data_b1, 
+                    test_data_b1,
+                    learning_data_b2,
+                    test_data_b2
+                    ],
+                study: 'concept learning and episodic memory',
+                date: Date()
+            });
+        },
+        default_iti: 250
+      });
+    })();
+  </script>

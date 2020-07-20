@@ -1,0 +1,6 @@
+You will see flowers displayed on the screen one at a time.
+For each flower, you need to determine whether it belongs to the species avolnia or not.
+If you think the flower is avolnia, you can press the Right key on the keyboard to answer "Yes". If you think the flower is not avolnia, you can press the Left key to answer "No".
+Please respond as fast and accurately as possible. You will receive feedback about the correctness of your answer after making a response.
+
+(When instructed, please press any key to begin the trial.)
