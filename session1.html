@@ -57,8 +57,12 @@
       var test1_num = 1
       // maximum repetitions
       var max_repeat = 3
-      // waiting period (in second)
+      // waiting period (in s)
       var waiting_time = 1
+      // fixation time (in ms)
+      var fixation_time = 1000
+      // feedback time (in ms)
+      var feedback_time = 1000
       // question for flowers
       var flower_question = "<br>Is this an avolnia?"
       // questions for turtles
@@ -310,9 +314,9 @@
         type: 'html-keyboard-response',
         stimulus: '+',
         choices: jsPsych.NO_KEYS,
-        trial_duration: 1200
+        trial_duration: fixation_time
       }
-      // draw images for block1 - learning  ****************************complete prompt
+      // draw images for block1 - learning
       var draw_image_learn_b1 = {
         type: 'image-button-response',
         stimulus: function(){ // draw image
@@ -353,7 +357,7 @@
           console.log('total correctness:', total_correct);
           return (jsPsych.data.get().last(1).values()[0].correct)? "<p>Correct</p>" : "<p>Incorrect</p>"; 
         },
-        trial_duration: 1200
+        trial_duration: feedback_time
       }
       // draw learning trials for block 1 
       var learning_block_1 = {
@@ -415,9 +419,9 @@
       // ---------------------------
       timeline.push(draw_learning_ins_b1)
       timeline.push(learning_loop_block_1)
-      // timeline.push(draw_end_learning)
-      // timeline.push(timer_loop)
-      mut_timeline.push('draw_learning_ins_b1', 'learning_loop_block_1')
+      timeline.push(draw_end_learning)
+      timeline.push(timer_loop)
+      mut_timeline.push('draw_learning_ins_b1', 'learning_loop_block_1', 'draw_end_learning', 'timer_loop')
 
 // ---------------------------------create test1 trials for block 1 --------------------------------------
       // draw insturctions for block1 test
@@ -478,11 +482,11 @@
         trial_duration: 1200
       }
       // ---------------------------
-      // timeline.push(draw_test_ins_b1)
+      timeline.push(draw_test_ins_b1)
       timeline.push(test1_block_1)
-      // timeline.push(draw_end_test)
-      // timeline.push(timer_loop)
-      mut_timeline.push('test1_block_1')
+      timeline.push(draw_end_test)
+      timeline.push(timer_loop)
+      mut_timeline.push('draw_test_ins_b1', 'test1_block_1', 'draw_end_test', 'timer_loop')
 
 // ---------------------------------create learning trials for block 2 --------------------------------------
       // draw instructions for block2 learning
@@ -527,11 +531,11 @@
       var learning_loop_block_2 = Object.assign({}, learning_loop_block_1)
       learning_loop_block_2.timeline = [learning_block_2]
       // ---------------------------
-      // timeline.push(draw_learning_ins_b2)
+      timeline.push(draw_learning_ins_b2)
       timeline.push(learning_loop_block_2)
-      // timeline.push(draw_end_learning)
-      // timeline.push(timer_loop)
-      mut_timeline.push('learning_loop_block_2')
+      timeline.push(draw_end_learning)
+      timeline.push(timer_loop)
+      mut_timeline.push('draw_learning_ins_b2', 'learning_loop_block_2', 'draw_end_learning', 'timer_loop')
 
 // ---------------------------------create test1 trials for block 2 --------------------------------------
       // draw insturctions for block2 test
@@ -586,10 +590,10 @@
         trial_duration: 1200
       }
       // ---------------------------
-      // timeline.push(draw_test_ins_b2)
+      timeline.push(draw_test_ins_b2)
       timeline.push(test1_block_2)
-      // timeline.push(draw_end_session)
-      mut_timeline.push('test1_block_2')
+      timeline.push(draw_end_session)
+      mut_timeline.push('draw_test_ins_b2', 'test1_block_2', 'draw_end_session')
 
 // ---------------------------------create surveys --------------------------------------
       var draw_general_questions = {
