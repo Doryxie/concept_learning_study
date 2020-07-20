@@ -8,6 +8,7 @@
     <script src="jspsych-6.1.0/plugins/jspsych-instructions.js"></script>
     <script src="jspsych-6.1.0/plugins/jspsych-external-html.js"></script>
     <script src="jspsych-6.1.0/plugins/jspsych-survey-text.js"></script>
+    <script src="jspsych-6.1.0/plugins/jspsych-survey-multi-select.js"></script>
     <script src="jspsych-6.1.0/plugins/jspsych-survey-html-form.js"></script>
     <script src="jspsych-6.1.0/plugins/jspsych-image-slider-response.js"></script>
     <script src="https://code.jquery.com/jquery-1.11.0.min.js"></script> 
@@ -51,9 +52,9 @@
       // set correctness threshold
       var correct_threshold = 0.50
       // number of learning trials
-      var learning_num = 2
-      // number of test1 trials
-      var test1_num = 3
+      var learning_num = 1
+      // number of test trials
+      var test1_num = 1
       // maximum repetitions
       var max_repeat = 3
       // waiting period (in second)
@@ -254,7 +255,7 @@
       // begin learning
       var initial_questions = {
         type:'survey-text',
-        questions: [{prompt: "Subject ID", name: "subject_id"}],
+        questions: [{prompt: "Subject ID", name: "subject_id", required: true}],
         // Subject ID = subject number + trial sequence + image order + problem order
         // subject number: 001 ~ 999
         // trial sequence: 1 ~ 6
@@ -275,9 +276,6 @@
           },
         on_finish: async function(data) {
           var subject_info = JSON.parse(data.responses).subject_id;
-          if (subject_info == '') {
-            subject_info = default_id;
-          };
           data.subject = subject_info.substring(0, 3);
           data.trial_sequence = subject_info[3];
           data.img_b1 = subject_info[4];
@@ -436,10 +434,10 @@
         return (img_name + jsPsych.data.get().first(2).values()[1].stm_test1_b1[t_count]['image_file']);
       }
       draw_image_test_b1_c.on_finish = function(data){
-          data.type = jsPsych.data.get().first(2).values()[1].stm_test1_b1[l_count]['image_type'];
-          data.number = jsPsych.data.get().first(2).values()[1].stm_test1_b1[l_count]['image_number'];
-          data.property = jsPsych.data.get().first(2).values()[1].stm_test1_b1[l_count]['image_property'];
-          data.phase = jsPsych.data.get().first(2).values()[1].stm_test1_b1[l_count]['image_phase'];
+          data.type = jsPsych.data.get().first(2).values()[1].stm_test1_b1[t_count]['image_type'];
+          data.number = jsPsych.data.get().first(2).values()[1].stm_test1_b1[t_count]['image_number'];
+          data.property = jsPsych.data.get().first(2).values()[1].stm_test1_b1[t_count]['image_property'];
+          data.phase = jsPsych.data.get().first(2).values()[1].stm_test1_b1[t_count]['image_phase'];
           if (jsPsych.data.get().first(2).values()[1].problem_b1 == 0) { // if type1 problem
             data.correct = (data.button_pressed == 0) ? (['t1', 'b'].includes(data.type)) : (['t2', 'n'].includes(data.type));
           } else { // if type2 problem
@@ -458,10 +456,10 @@
         max: 4,
         start: 1,
         on_finish: function(data){
-          data.type = jsPsych.data.get().first(2).values()[1].stm_test1_b1[l_count]['image_type'];
-          data.number = jsPsych.data.get().first(2).values()[1].stm_test1_b1[l_count]['image_number'];
-          data.property = jsPsych.data.get().first(2).values()[1].stm_test1_b1[l_count]['image_property'];
-          data.phase = jsPsych.data.get().first(2).values()[1].stm_test1_b1[l_count]['image_phase'];
+          data.type = jsPsych.data.get().first(2).values()[1].stm_test1_b1[t_count]['image_type'];
+          data.number = jsPsych.data.get().first(2).values()[1].stm_test1_b1[t_count]['image_number'];
+          data.property = jsPsych.data.get().first(2).values()[1].stm_test1_b1[t_count]['image_property'];
+          data.phase = jsPsych.data.get().first(2).values()[1].stm_test1_b1[t_count]['image_phase'];
           data.correct = (data.response > 2)? (data.phase == 'LP') : (data.phase != 'LP');
           t_count += 1;
           console.log('correct:', data.correct);
@@ -550,10 +548,10 @@
         return (img_name + jsPsych.data.get().first(2).values()[1].stm_test1_b2[t_count]['image_file']);
       }
       draw_image_test_b2_c.on_finish = function(data){
-        data.type = jsPsych.data.get().first(2).values()[1].stm_test1_b2[l_count]['image_type'];
-        data.number = jsPsych.data.get().first(2).values()[1].stm_test1_b2[l_count]['image_number'];
-        data.property = jsPsych.data.get().first(2).values()[1].stm_test1_b2[l_count]['image_property'];
-        data.phase = jsPsych.data.get().first(2).values()[1].stm_test1_b2[l_count]['image_phase'];
+        data.type = jsPsych.data.get().first(2).values()[1].stm_test1_b2[t_count]['image_type'];
+        data.number = jsPsych.data.get().first(2).values()[1].stm_test1_b2[t_count]['image_number'];
+        data.property = jsPsych.data.get().first(2).values()[1].stm_test1_b2[t_count]['image_property'];
+        data.phase = jsPsych.data.get().first(2).values()[1].stm_test1_b2[t_count]['image_phase'];
         if (jsPsych.data.get().first(2).values()[1].problem_b2 == 0) { // if type1 problem
           data.correct = (data.button_pressed == 0) ? (['t1', 'b'].includes(data.type)) : (['t2', 'n'].includes(data.type));
         } else { // if type2 problem
@@ -567,10 +565,10 @@
         return (img_name + jsPsych.data.get().first(2).values()[1].stm_test1_b2[t_count]['image_file']);
       }
       draw_image_test_b2_r.on_finish = function(data){
-        data.type = jsPsych.data.get().first(2).values()[1].stm_test1_b2[l_count]['image_type'];
-        data.number = jsPsych.data.get().first(2).values()[1].stm_test1_b2[l_count]['image_number'];
-        data.property = jsPsych.data.get().first(2).values()[1].stm_test1_b2[l_count]['image_property'];
-        data.phase = jsPsych.data.get().first(2).values()[1].stm_test1_b2[l_count]['image_phase'];
+        data.type = jsPsych.data.get().first(2).values()[1].stm_test1_b2[t_count]['image_type'];
+        data.number = jsPsych.data.get().first(2).values()[1].stm_test1_b2[t_count]['image_number'];
+        data.property = jsPsych.data.get().first(2).values()[1].stm_test1_b2[t_count]['image_property'];
+        data.phase = jsPsych.data.get().first(2).values()[1].stm_test1_b2[t_count]['image_phase'];
         data.correct = (data.response > 2)? (data.phase == 'LP') : (data.phase != 'LP');
         t_count += 1;
         console.log('correct:', data.correct);
@@ -597,170 +595,183 @@
       var draw_general_questions = {
         type: 'survey-html-form',
         html: '<p style="text-align:left;">\
-          1. How old are you? <input name="age" type="number" min="8" max="100"/>\
-          2. What is your gender?\
-          <input type="radio" id="male" name="gender" value="male"/>\
-          <label for="male">Male</label><br>\
-          <input type="radio" id="female" name="gender" value="female"/>\
-          <label for="female">Female</label><br>\
-          <input type="radio" id="other" name="gender" value="other"/>\
-          <label for="other">Other</label><br>\
-          3. Are you left- or right- handed?\
-          <input type="radio" id="left" name="handedness" value="left"/>\
-          <label for="left">Left</label><br>\
-          <input type="radio" id="right" name="handedness" value="right"/>\
-          <label for="right">Right</label><br>\
-          <input type="radio" id="both" name="handedness" value="both"/>\
-          <label for="both">Both</label>\
-          4. What is your ethnicity? Please select ALL that apply.\
-          <input type="checkbox" id="Caucasian" name="ethnicity" value="Caucasian"/>\
-          <label for="Caucasian">Caucasian</label><br>\
-          <input type="checkbox" id="Latino/Hispanic" name="ethnicity" value="Latino/Hispanic"/>\
-          <label for="Latino/Hispanic">Latino/Hispanic</label><br>\
-          <input type="checkbox" id="Middle Eastern" name="ethnicity" value="Middle Eastern"/>\
-          <label for="Middle Eastern">Middle Eastern</label><br>\
-          <input type="checkbox" id="African" name="ethnicity" value="African"/>\
-          <label for="African">African</label><br>\
-          <input type="checkbox" id="Caribbean" name="ethnicity" value="Caribbean"/>\
-          <label for="Caribbean">Caribbean</label><br>\
-          <input type="checkbox" id="South Asia" name="ethnicity" value="South Asia"/>\
-          <label for="South Asia">South Asia</label><br>\
-          <input type="checkbox" id="East Asia" name="ethnicity" value="East Asia"/>\
-          <label for="East Asia">East Asia</label><br>\
-          <input type="checkbox" id="Other" name="ethnicity" value="Other"/>\
-          <label for="Other">Other</label><br>\
-          5. Do you currently have any vision problems? If so, is your vision corrected (ex. via glasses, contact lenses)?\
-          <input type="radio" id="healthy" name="vision" value="healthy"/>\
+          1. How old are you?  <input name="age" type="number" min="8" max="100" required><br><br>\
+          2. What is your gender?<br>\
+          <input type="radio" id="male" name="gender" value="male" required>\
+          <label for="male">Male</label>  \
+          <input type="radio" id="female" name="gender" value="female">\
+          <label for="female">Female</label>  \
+          <input type="radio" id="other" name="gender" value="other">\
+          <label for="other">Other</label><br><br>\
+          3. Are you left- or right-handed?<br>\
+          <input type="radio" id="left" name="handedness" value="left" required>\
+          <label for="left">Left</label>  \
+          <input type="radio" id="right" name="handedness" value="right">\
+          <label for="right">Right</label>  \
+          <input type="radio" id="both" name="handedness" value="both">\
+          <label for="both">Both</label><br><br>\
+          </p>'
+        };
+      
+      var draw_ethnicity_checkbox = {
+        type: 'survey-multi-select',
+        questions:  [
+          {
+            prompt: "What is your ethnicity? Please select ALL that apply.", 
+            options: ["Caucasian", "Latino/Hispanic", "Middle Eastern", "African", "Caribbean", "South Asia", "East Asia", "Other"], 
+            required: true,
+            name: 'ethnicity'
+          }
+        ]
+      };
+
+      var draw_screening_questions = {
+        type: 'survey-html-form',
+        html: '<p style="text-align:left;">\
+          5. Do you currently have any vision problems? If so, is your vision corrected (ex. via glasses, contact lenses)?<br>\
+          <input type="radio" id="healthy" name="vision" value="healthy" required>\
           <label for="healthy">I do not have any vision problems</label><br>\
-          <input type="radio" id="corrected" name="vision" value="corrected"/>\
+          <input type="radio" id="corrected" name="vision" value="corrected">\
           <label for="corrected">I have vision problems, and my vision is corrected</label><br>\
-          <input type="radio" id="uncorrected" name="vision" value="uncorrected"/>\
-          <label for="uncorrected">I have vision problems, and my vision is NOT corrected</label>\
-          6. Are you currently taking any medications that affect your sleep, memory, or learning?\
-          <input type="radio" id="yes" name="medication use" value="yes"/>\
-          <label for="yes">Yes</label><br>\
-          <input type="radio" id="no" name="medication use" value="no"/>\
-          <label for="no">No</label><br>\
-          7. Are you in any medical conditions (ex. epilepsy, traumatic brain injury, ADHD) that affect your sleep, memory, or learning?\
-          <input type="radio" id="yes" name="medical condition" value="yes"/>\
-          <label for="yes">Yes</label><br>\
-          <input type="radio" id="no" name="medical condition" value="no"/>\
-          <label for="no">No</label><br>\
-          8. Do you have color blindness?\
-          <input type="radio" id="yes" name="color blindness" value="yes"/>\
-          <label for="yes">Yes</label><br>\
-          <input type="radio" id="no" name="color blindness" value="no"/>\
-          <label for="no">No</label><br>\
+          <input type="radio" id="uncorrected" name="vision" value="uncorrected">\
+          <label for="uncorrected">I have vision problems, and my vision is NOT corrected</label><br><br>\
+          6. Are you currently taking any medications that affect your sleep, memory, or learning?<br>\
+          <input type="radio" id="yes" name="medication use" value="yes" required>\
+          <label for="yes">Yes</label>  \
+          <input type="radio" id="no" name="medication use" value="no">\
+          <label for="no">No</label><br><br>\
+          7. Are you in any medical conditions (ex. epilepsy, traumatic brain injury, ADHD) that affect your sleep, memory, or learning?<br>\
+          <input type="radio" id="yes" name="medical condition" value="yes" required>\
+          <label for="yes">Yes</label>  \
+          <input type="radio" id="no" name="medical condition" value="no">\
+          <label for="no">No</label><br><br>\
+          8. Do you have color blindness?<br>\
+          <input type="radio" id="yes" name="color blindness" value="yes" required>\
+          <label for="yes">Yes</label>  \
+          <input type="radio" id="no" name="color blindness" value="no">\
+          <label for="no">No</label>\
           </p>'
       };
+
       var draw_SMHSQ_questions = {
         type: 'survey-html-form',
         html: '<p style="text-align:left;">\
-          1. At what time did you settle down for the night? <input type="time" name="settle-down time"/>\
-          2. At what time did you fall asleep last night? <input type="time" name="fall-asleep time"/>\
-          3. At what time did you finally wake this morning? <input type="time" name="wake-up time"/>\
-          4. At what time did you get up this morning? <input type="time" name="get-up time"/>\
-          5. Was your sleep:\
-          <input type="radio" id="very light" name="depth of sleep" value="very light"/>\
+          1. At what time did you settle down for the night?  <input type="time" name="settle-down time" required><br><br>\
+          2. At what time did you fall asleep last night?  <input type="time" name="fall-asleep time" required><br><br>\
+          3. At what time did you finally wake this morning?  <input type="time" name="wake-up time" required><br><br>\
+          4. At what time did you get up this morning?  <input type="time" name="get-up time" required><br><br>\
+          5. Was your sleep:<br>\
+          <input type="radio" id="very light" name="depth of sleep" value="very light" required>\
           <label for="very light">very light</label><br>\
-          <input type="radio" id="light" name="depth of sleep" value="light"/>\
+          <input type="radio" id="light" name="depth of sleep" value="light">\
           <label for="light">light</label><br>\
-          <input type="radio" id="fairly light" name="depth of sleep" value="fairly light"/>\
+          <input type="radio" id="fairly light" name="depth of sleep" value="fairly light">\
           <label for="fairly light">fairly light</label><br>\
-          <input type="radio" id="light average" name="depth of sleep" value="light average"/>\
+          <input type="radio" id="light average" name="depth of sleep" value="light average">\
           <label for="light average">light average</label><br>\
-          <input type="radio" id="fairly deep" name="depth of sleep" value="fairly deep"/>\
+          <input type="radio" id="fairly deep" name="depth of sleep" value="fairly deep">\
           <label for="fairly deep">fairly deep</label><br>\
-          <input type="radio" id="deep" name="depth of sleep" value="deep"/>\
+          <input type="radio" id="deep" name="depth of sleep" value="deep">\
           <label for="deep">deep</label><br>\
-          <input type="radio" id="very deep" name="depth of sleep" value="very deep"/>\
-          <label for="very deep">very deep</label><br>\
-          6. How many times did you wake up?\
-          <input type="radio" id="Not at all" name="wake-up frequency" value="Not at all"/>\
+          <input type="radio" id="very deep" name="depth of sleep" value="very deep">\
+          <label for="very deep">very deep</label><br><br>\
+          6. How many times did you wake up?<br>\
+          <input type="radio" id="Not at all" name="wake-up frequency" value="Not at all" required>\
           <label for="Not at all">Not at all</label><br>\
-          <input type="radio" id="Once" name="wake-up frequency" value="Once"/>\
+          <input type="radio" id="Once" name="wake-up frequency" value="Once">\
           <label for="Once">Once</label><br>\
-          <input type="radio" id="Twice" name="wake-up frequency" value="Twice"/>\
+          <input type="radio" id="Twice" name="wake-up frequency" value="Twice">\
           <label for="Twice">Twice</label><br>\
-          <input type="radio" id="Three times" name="wake-up frequency" value="Three times"/>\
+          <input type="radio" id="Three times" name="wake-up frequency" value="Three times">\
           <label for="Three times">Three times</label><br>\
-          <input type="radio" id="Four times" name="wake-up frequency" value="Four times"/>\
+          <input type="radio" id="Four times" name="wake-up frequency" value="Four times">\
           <label for="Four times">Four times</label><br>\
-          <input type="radio" id="Five times" name="wake-up frequency" value="Five times"/>\
+          <input type="radio" id="Five times" name="wake-up frequency" value="Five times">\
           <label for="Five times">Five times</label><br>\
-          <input type="radio" id="Six times" name="wake-up frequency" value="Six times"/>\
+          <input type="radio" id="Six times" name="wake-up frequency" value="Six times">\
           <label for="Six times">Six times</label><br>\
-          <input type="radio" id="More than six times" name="wake-up frequency" value="More than six times"/>\
-          <label for="More than six times">More than six times</label><br>\
+          <input type="radio" id="More than six times" name="wake-up frequency" value="More than six times">\
+          <label for="More than six times">More than six times</label><br><br>\
           7. How much sleep did you have last night?<br>\
-          Hrs.: <input type="number" name="sleep amount at night - hrs"/><br>\
-          Mins.: <input type="number" name="sleep amount at night - mins"/><br>\
+          Hrs.: <input type="number" name="sleep amount at night - hrs" required><br>\
+          Mins.: <input type="number" name="sleep amount at night - mins" required><br><br>\
           8. How much sleep did you have during the day, yesterday?<br>\
-          Hrs.: <input type="number" name="sleep amount in day - hrs"/><br>\
-          Mins.: <input type="number" name="sleep amount in day - mins"/><br>\
-          9. How well did you sleep last night?\
-          <input type="radio" id="Very badly" name="feeling of sleep" value="Very badly"/>\
+          Hrs.: <input type="number" name="sleep amount in day - hrs" required><br>\
+          Mins.: <input type="number" name="sleep amount in day - mins" required><br><br>\
+          9. How well did you sleep last night?<br>\
+          <input type="radio" id="Very badly" name="feeling of sleep" value="Very badly" required>\
           <label for="Very badly">Very badly</label><br>\
-          <input type="radio" id="Badly" name="sleep satisfaction" value="Badly"/>\
+          <input type="radio" id="Badly" name="feeling of sleep" value="Badly">\
           <label for="Badly">Badly</label><br>\
-          <input type="radio" id="Fairly badly" name="sleep satisfaction" value="Fairly badly"/>\
+          <input type="radio" id="Fairly badly" name="feeling of sleep" value="Fairly badly">\
           <label for="Fairly badly">Fairly badly</label><br>\
-          <input type="radio" id="Fairly well" name="sleep satisfaction" value="Fairly well"/>\
+          <input type="radio" id="Fairly well" name="feeling of sleep" value="Fairly well">\
           <label for="Fairly well">Fairly well</label><br>\
-          <input type="radio" id="Well" name="sleep satisfaction" value="Well"/>\
+          <input type="radio" id="Well" name="feeling of sleep" value="Well">\
           <label for="Well">Well</label><br>\
-          <input type="radio" id="Very well" name="sleep satisfaction" value="Very well"/>\
-          <label for="Very well">Very well</label><br>\
-          10. How clear-headed did you feel after getting up this morning?\
-          <input type="radio" id="Still very drowsy indeed" name="clear-headedness" value="Still very drowsy indeed"/>\
+          <input type="radio" id="Very well" name="feeling of sleep" value="Very well">\
+          <label for="Very well">Very well</label><br><br>\
+          10. How clear-headed did you feel after getting up this morning?<br>\
+          <input type="radio" id="Still very drowsy indeed" name="clear-headedness" value="Still very drowsy indeed" required>\
           <label for="Still very drowsy indeed">Still very drowsy indeed</label><br>\
-          <input type="radio" id="Still moderately drowsy" name="clear-headedness" value="Still moderately drowsy"/>\
+          <input type="radio" id="Still moderately drowsy" name="clear-headedness" value="Still moderately drowsy">\
           <label for="Still moderately drowsy">Still very moderately drowsy</label><br>\
-          <input type="radio" id="Still slightly drowsy" name="clear-headedness" value="Still slightly drowsy"/>\
+          <input type="radio" id="Still slightly drowsy" name="clear-headedness" value="Still slightly drowsy">\
           <label for="Still slightly drowsy">Still very slightly drowsy</label><br>\
-          <input type="radio" id="Fairly clear-headed" name="clear-headedness" value="Fairly clear-headed"/>\
+          <input type="radio" id="Fairly clear-headed" name="clear-headedness" value="Fairly clear-headed">\
           <label for="Fairly clear-headed">Fairly clear-headed</label><br>\
-          <input type="radio" id="Alert" name="clear-headedness" value="Alert"/>\
+          <input type="radio" id="Alert" name="clear-headedness" value="Alert">\
           <label for="Alert">Alert</label><br>\
-          <input type="radio" id="Very alert" name="clear-headedness" value="Very alert"/>\
-          <label for="Very alert">Very alert</label><br>\
-          11. How satisfied were you with last night\'s sleep?\
-          <input type="radio" id="Very unsatisfied" name="sleep satisfaction" value="Very unsatisfied"/>\
+          <input type="radio" id="Very alert" name="clear-headedness" value="Very alert">\
+          <label for="Very alert">Very alert</label><br><br>\
+          11. How satisfied were you with last night\'s sleep?<br>\
+          <input type="radio" id="Very unsatisfied" name="sleep satisfaction" value="Very unsatisfied" required>\
           <label for="Very unsatisfied">Very unsatisfied</label><br>\
-          <input type="radio" id="Moderately unsatisfied" name="sleep satisfaction" value="Moderately unsatisfied"/>\
+          <input type="radio" id="Moderately unsatisfied" name="sleep satisfaction" value="Moderately unsatisfied">\
           <label for="Moderately unsatisfied">Moderately unsatisfied</label><br>\
-          <input type="radio" id="Slightly unsatisfied" name="sleep satisfaction" value="Slightly unsatisfied"/>\
+          <input type="radio" id="Slightly unsatisfied" name="sleep satisfaction" value="Slightly unsatisfied">\
           <label for="Slightly unsatisfied">Slightly unsatisfied</label><br>\
-          <input type="radio" id="Fairly satisfied" name="sleep satisfaction" value="Fairly satisfied"/>\
+          <input type="radio" id="Fairly satisfied" name="sleep satisfaction" value="Fairly satisfied">\
           <label for="Fairly satisfied">Fairly satisfied</label><br>\
-          <input type="radio" id="Completely  satisfied" name="sleep satisfaction" value="Completely  satisfied"/>\
-          <label for="Completely  satisfied">Completely  satisfied</label><br>\
-          12. Were you troubled by waking early and being unable to get off to sleep again?\
-          <input type="radio" id="Yes" name="early wake-up" value="Yes"/>\
-          <label for="Yes">Yes</label><br>\
-          <input type="radio" id="No" name="early wake-up" value="No"/>\
-          <label for="No">No</label><br>\
-          13. How much difficulty did you have in getting off to sleep last night?\
-          <input type="radio" id="None or very little" name="sleep difficulty" value="None or very little"/>\
+          <input type="radio" id="Completely satisfied" name="sleep satisfaction" value="Completely satisfied">\
+          <label for="Completely satisfied">Completely satisfied</label><br><br>\
+          12. Were you troubled by waking early and being unable to get off to sleep again?<br>\
+          <input type="radio" id="Yes" name="early wake-up" value="Yes" required>\
+          <label for="Yes">Yes</label>  \
+          <input type="radio" id="No" name="early wake-up" value="No">\
+          <label for="No">No</label><br><br>\
+          13. How much difficulty did you have in getting off to sleep last night?<br>\
+          <input type="radio" id="None or very little" name="sleep difficulty" value="None or very little" required>\
           <label for="None or very little">None or very little</label><br>\
-          <input type="radio" id="Some" name="sleep difficulty" value="Some"/>\
+          <input type="radio" id="Some" name="sleep difficulty" value="Some">\
           <label for="Some">Some</label><br>\
-          <input type="radio" id="A lot" name="sleep difficulty" value="A lot"/>\
+          <input type="radio" id="A lot" name="sleep difficulty" value="A lot">\
           <label for="A lot">A lot</label><br>\
-          <input type="radio" id="Extreme difficulty" name="sleep difficulty" value="Extreme difficulty"/>\
-          <label for="Extreme difficulty">Extreme difficulty</label><br>\
+          <input type="radio" id="Extreme difficulty" name="sleep difficulty" value="Extreme difficulty">\
+          <label for="Extreme difficulty">Extreme difficulty</label><br><br>\
           14. How long did it take you to fall asleep last night?<br>\
-          Hrs.: <input type="number" name="hrs took to sleep"/><br>\
-          Mins.: <input type="number" name="mins took to sleep"/>\
+          Hrs.: <input type="number" name="hrs took to sleep" required><br>\
+          Mins.: <input type="number" name="mins took to sleep" required>\
         </p>'
       };
-      timeline.push(draw_general_questions)
+      timeline.push(draw_general_questions, draw_ethnicity_checkbox, draw_screening_questions)
       // ---------------------------------end experiment --------------------------------------
       jsPsych.init({
         timeline: timeline,
         preload_images: images,
         on_finish: function() {
-          var subject_information = jsPsych.data.get().filter([{trial_type: 'survey-html-form'}, {trial_type: 'survey-text'}]);
+          var survey_data = jsPsych.data.get().filter([{trial_type: 'survey-html-form'}, {trial_type: 'survey-multi-select'}]).values();
+          var subject_data = {
+            'subject id': jsPsych.data.get().first(2).values()[1].subject,
+            'trial sequence': jsPsych.data.get().first(2).values()[1].trial_sequence,
+            'block1 image': jsPsych.data.get().first(2).values()[1].img_b1,
+            'block2 image': jsPsych.data.get().first(2).values()[1].img_b2,
+            'block1 problem': jsPsych.data.get().first(2).values()[1].problem_b1,
+            'block2 problem': jsPsych.data.get().first(2).values()[1].problem_b2,
+          };
+          for (let x = 0; x < survey_data.length; x++){
+            Object.assign(subject_data, JSON.parse(survey_data[x].responses));
+          };
           var responses = jsPsych.data.get().filter([{trial_type: 'image-button-response'}, {trial_type: 'image-slider-response'}]);
           // organize data for learning - block 1
           var learning_data_b1 = responses.filterCustom(function(x){
@@ -790,22 +801,23 @@
             'categorization': test_data_b2.filter({trial_type: 'image-button-response'}).values(),
             'recognition': test_data_b2.filter({trial_type: 'image-slider-response'}).values()
             };
-          console.log(learning_data_b1)
+          console.log(learning_data_b1);
           console.log(test_data_b1);
           console.log(learning_data_b2);
-          console.log(test_data_b2);
+          console.log(test_data_b2);        
+          console.log(subject_data);
           // jsPsych.data.displayData();
           var tmp = new Uint32Array(1);
             tmp = window.crypto.getRandomValues(tmp)
             var dbpath = firebase.auth().currentUser.uid+'/'+tmp;
             firebase.database().ref(dbpath).set({
                 data: [
-                    subject_information,
-                    learning_data_b1, 
-                    test_data_b1,
-                    learning_data_b2,
-                    test_data_b2
-                    ],
+                  subject_data,
+                  learning_data_b1, 
+                  test_data_b1,
+                  learning_data_b2,
+                  test_data_b2
+                ],
                 study: 'concept learning and episodic memory',
                 date: Date()
             });
