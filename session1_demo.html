@@ -452,13 +452,13 @@
       var draw_test_ins_b1 = Object.assign({}, draw_learning_ins_b1)
       draw_test_ins_b1.pages = function(){
         var i = (jsPsych.data.get().first(2).values()[1].img_b1 == 0)? leaning_ins_f : leaning_ins_t;
-        return [(ins_block_1 + " test phase, " + i), start_trial];
+        return [("For the categorization task in the Block 1 test phase, " + i), test1_ins_recognition, start_trial];
       };
       // draw insturctions for block2 test
       var draw_test_ins_b2 = Object.assign({}, draw_learning_ins_b1)
       draw_test_ins_b2.pages = function(){
         var i = (jsPsych.data.get().first(2).values()[1].img_b2 == 0)? leaning_ins_f : leaning_ins_t;
-        return [(ins_block_2 + " test phase, " + i), start_trial];
+        return [("For the categorization task in the Block 2 test phase, " + i), test1_ins_recognition, start_trial];
       };
       // draw images for categorization
       var draw_image_test_c = {
@@ -756,7 +756,7 @@
               learning_data_b2,
               test_data_b2
             ],
-            study: 'concept learning and episodic memory',
+            study: 'concept learning and episodic memory - S1',
             date: Date()
           });
         },
