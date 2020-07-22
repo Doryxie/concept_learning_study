@@ -408,6 +408,7 @@
               [total_correct, total_count, repetition_count, t_count] = [0,0,0,0];
               return false;
             } else {
+              [total_correct, total_count] = [0,0];
               repetition_count += 1;
               return true;
             };
@@ -532,7 +533,7 @@
           data.number = curr_stm[t_count]['image_number'];
           data.property = curr_stm[t_count]['image_property'];
           data.phase = curr_stm[t_count]['image_phase'];
-          data.correct = (data.response > 2)? (data.phase == 'LP') : (data.phase != 'LP');
+          data.correct = (data.response < 3)? (data.phase == 'LP') : (data.phase != 'LP');
           t_count += 1;
           console.log('correct:', data.correct);
         }
