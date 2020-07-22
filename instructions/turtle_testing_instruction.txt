@@ -1,9 +1,0 @@
-You will see turtles displayed one at a time, and you need to determine whether each turtle belongs to the species cordies or not.
-If you think the turtle is cordies, you can press the Right key to answer "Yes". If you think the turtle is not cordies, you can press the Left key to answer "No".
-(When instructed, please press any key to continue.)
-
-After the classification, you need to indicate whether you have seen the turtle in previous tasks using a 4-point scale. 
-The scale consists of four points: old, maybe old, maybe new, and new. "Old" means that you remember seeing the turtle in previous tasks. "New" means that you don't remember seeing the turtle previously.
-To make your response, you need to use the mouse to click on one of the points on the scale. Please respond as fast and accurately as possible. 
-
-(When instructed, please press any key to begin the trial.)

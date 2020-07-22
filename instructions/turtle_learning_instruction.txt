@@ -1,6 +1,0 @@
-You will see turtles displayed on the screen one at a time.
-For each turtle, you need to determine whether it belongs to the species cordies or not.
-If you think the turtle is cordies, you can press the Right key on the keyboard to answer "Yes". If you think the turtle is not cordies, you can press the Left key to answer "No".
-Please respond as fast and accurately as possible. You will receive feedback about the correctness of your answer after making a response.
-
-(When instructed, please press any key to begin the trial.)
