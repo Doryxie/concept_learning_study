@@ -702,76 +702,71 @@
       };
       
       timeline.push(draw_SMHSQ_questions, draw_end_session);
-      console.log('version0.4');
+      console.log('version0.5');
       // ---------------------------------end experiment --------------------------------------
       jsPsych.init({
         timeline: timeline,
         preload_images: images,
-        on_close: function() {
+        on_finish: function() {
           var end_time = new Date();
           var duration = (end_time - start_time) / 60000;
           var tmp = new Uint32Array(1);
           tmp = window.crypto.getRandomValues(tmp);
           var dbpath = firebase.auth().currentUser.uid+'/'+tmp;
-          if (jsPsych.currentTrial().stimulus != session_complete){       
-            firebase.database().ref(dbpath).set({
-              data: JsPsych.data.get().json()
-            });
-          } else {
-            var survey_data = jsPsych.data.get().filter([{trial_type: 'survey-html-form'}, {trial_type: 'survey-multi-select'}]).values();
-            var subject_data = {
-              'subject id': jsPsych.data.get().first(2).values()[1].subject,
-              'trial sequence': jsPsych.data.get().first(2).values()[1].trial_sequence,
-              'block1 image': jsPsych.data.get().first(2).values()[1].img_b1,
-              'block2 image': jsPsych.data.get().first(2).values()[1].img_b2,
-              'block1 problem': jsPsych.data.get().first(2).values()[1].problem_b1,
-              'block2 problem': jsPsych.data.get().first(2).values()[1].problem_b2,
-            };
-            for (let x = 0; x < survey_data.length; x++){
-              Object.assign(subject_data, JSON.parse(survey_data[x].responses));
-            };
-            var responses = jsPsych.data.get().filter([{trial_type: 'image-button-response'}, {trial_type: 'image-slider-response'}]);
-            // organize data for learning - block 1
-            var learning_data_b1 = responses.filterCustom(function(x){
-              return x.internal_node_id.substring(0, 5) == ("0.0-" + mut_timeline.indexOf('learning_loop_block_1'));
-            });
-            learning_data_b1 = {'phase': 'learning-B1', 'data': learning_data_b1.values()};
-            // organize data for test - block 1
-            var test_data_b1 = responses.filterCustom(function(x){
-              return x.internal_node_id.substring(0, 5) == ("0.0-" + mut_timeline.indexOf('test1_block_1'));
-            });
-            test_data_b1 = {
-              'phase': 'test1-B1',
-              'categorization': test_data_b1.filter({trial_type: 'image-button-response'}).values(),
-              'recognition': test_data_b1.filter({trial_type: 'image-slider-response'}).values()
-            };
-            // organize data for learning - block 2
-            var learning_data_b2 = responses.filterCustom(function(x){
-              return x.internal_node_id.substring(0, 6) == ("0.0-" + mut_timeline.indexOf('learning_loop_block_2'));
-            });
-            learning_data_b2 = {'phase': 'learning-B2', 'data': learning_data_b2.values()};
-            // organize data for test - block 2
-            var test_data_b2 = responses.filterCustom(function(x){
-              return x.internal_node_id.substring(0, 6) == ("0.0-" + mut_timeline.indexOf('test1_block_2'));
-            });
-            test_data_b2 = {
-              'phase': 'test1-B2',
-              'categorization': test_data_b2.filter({trial_type: 'image-button-response'}).values(),
-              'recognition': test_data_b2.filter({trial_type: 'image-slider-response'}).values()
-            };
-            firebase.database().ref(dbpath).set({
-              data: [
-                subject_data,
-                learning_data_b1, 
-                test_data_b1,
-                learning_data_b2,
-                test_data_b2
-              ],
-              study: 'concept learning and episodic memory - S1',
-              duration: duration,
-              date: Date()
-            });
+          var survey_data = jsPsych.data.get().filter([{trial_type: 'survey-html-form'}, {trial_type: 'survey-multi-select'}]).values();
+          var subject_data = {
+            'subject id': jsPsych.data.get().first(2).values()[1].subject,
+            'trial sequence': jsPsych.data.get().first(2).values()[1].trial_sequence,
+            'block1 image': jsPsych.data.get().first(2).values()[1].img_b1,
+            'block2 image': jsPsych.data.get().first(2).values()[1].img_b2,
+            'block1 problem': jsPsych.data.get().first(2).values()[1].problem_b1,
+            'block2 problem': jsPsych.data.get().first(2).values()[1].problem_b2,
           };
+          for (let x = 0; x < survey_data.length; x++){
+            Object.assign(subject_data, JSON.parse(survey_data[x].responses));
+          };
+          var responses = jsPsych.data.get().filter([{trial_type: 'image-button-response'}, {trial_type: 'image-slider-response'}]);
+          // organize data for learning - block 1
+          var learning_data_b1 = responses.filterCustom(function(x){
+            return x.internal_node_id.substring(0, 5) == ("0.0-" + mut_timeline.indexOf('learning_loop_block_1'));
+          });
+          learning_data_b1 = {'phase': 'learning-B1', 'data': learning_data_b1.values()};
+          // organize data for test - block 1
+          var test_data_b1 = responses.filterCustom(function(x){
+            return x.internal_node_id.substring(0, 5) == ("0.0-" + mut_timeline.indexOf('test1_block_1'));
+          });
+          test_data_b1 = {
+            'phase': 'test1-B1',
+            'categorization': test_data_b1.filter({trial_type: 'image-button-response'}).values(),
+            'recognition': test_data_b1.filter({trial_type: 'image-slider-response'}).values()
+          };
+          // organize data for learning - block 2
+          var learning_data_b2 = responses.filterCustom(function(x){
+            return x.internal_node_id.substring(0, 6) == ("0.0-" + mut_timeline.indexOf('learning_loop_block_2'));
+          });
+          learning_data_b2 = {'phase': 'learning-B2', 'data': learning_data_b2.values()};
+          // organize data for test - block 2
+          var test_data_b2 = responses.filterCustom(function(x){
+            return x.internal_node_id.substring(0, 6) == ("0.0-" + mut_timeline.indexOf('test1_block_2'));
+          });
+          test_data_b2 = {
+            'phase': 'test1-B2',
+            'categorization': test_data_b2.filter({trial_type: 'image-button-response'}).values(),
+            'recognition': test_data_b2.filter({trial_type: 'image-slider-response'}).values()
+          };
+          firebase.database().ref(dbpath).set({
+            data: [
+              subject_data,
+              learning_data_b1, 
+              test_data_b1,
+              learning_data_b2,
+              test_data_b2
+            ],
+            study: 'concept learning and episodic memory - S1',
+            duration: duration,
+            date: Date()
+          });
+          alert("please close the window");
         },
         default_iti: 250
       });
