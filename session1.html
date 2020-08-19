@@ -702,7 +702,7 @@
       };
       
       timeline.push(draw_SMHSQ_questions, draw_end_session);
-      console.log('version0.3');
+      console.log('version0.4');
       // ---------------------------------end experiment --------------------------------------
       jsPsych.init({
         timeline: timeline,
@@ -713,13 +713,10 @@
           var tmp = new Uint32Array(1);
           tmp = window.crypto.getRandomValues(tmp);
           var dbpath = firebase.auth().currentUser.uid+'/'+tmp;
-          if (jsPsych.currentTrial().stimulus == session_complete){       
+          if (!jsPsych.currentTrial().stimulus == session_complete){       
             console.log(jsPsych.data.get());        
             firebase.database().ref(dbpath).set({
-              data: ['something'],
-              study: 'concept learning and episodic memory - S1 - W',
-              duration: duration,
-              date: Date()
+              data: 'something'
             });
           } else {
             var survey_data = jsPsych.data.get().filter([{trial_type: 'survey-html-form'}, {trial_type: 'survey-multi-select'}]).values();
