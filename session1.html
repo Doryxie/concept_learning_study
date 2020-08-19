@@ -716,7 +716,7 @@
           if (jsPsych.currentTrial().stimulus == session_complete){       
             console.log(jsPsych.data.get());        
             firebase.database().ref(dbpath).set({
-              data: [jsPsych.data.get().values()[0]],
+              data: [jsPsych.data.get().values()[1]],
               study: 'concept learning and episodic memory - S1 - W',
               duration: duration,
               date: Date()
