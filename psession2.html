@@ -610,7 +610,7 @@
             'categorization': test_data_b2.filter({trial_type: 'image-button-response'}).values(),
             'recognition': test_data_b2.filter({trial_type: 'image-slider-response'}).values()
             };
-          var duration = (end_time - start_time) / 60000;
+          var duration = ((end_time - start_time) / 60000).toFixed(2);
           var tmp = new Uint32Array(1);
           tmp = window.crypto.getRandomValues(tmp);
           var dbpath = firebase.auth().currentUser.uid+'/'+tmp;
