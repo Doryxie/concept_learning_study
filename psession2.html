@@ -14,9 +14,9 @@
     <script src="jspsych-6.1.0/plugins/jspsych-image-slider-response.js"></script>
     <script src="https://code.jquery.com/jquery-1.11.0.min.js"></script> 
     <script src="jspsych-6.1.0/plugins/jspsych-call-function.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/7.16.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/7.16.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/7.16.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.19.1/firebase-database.js"></script>
     <link href="jspsych-6.1.0/css/jspsych.css" rel="stylesheet" type="text/css"></link>
   </head>
   <body style = "background-color:	#c5c5c5;"></body>
@@ -49,7 +49,7 @@
       // selected dimensions for turtle stimuli
       var turtle_selected_dimensions = ['shell_shapes','leg_colors', 'leg_shapes', 'head_shapes', 'spot_colors'];
       // number of test trials
-      var test2_num = 64;
+      var test2_num = 4;
       // fixation time (in ms)
       var fixation_time = 1000;
       // instruction time (in ms)
@@ -573,12 +573,28 @@
         cont_btn: "end"
       };
       timeline.push(draw_debriefing);
-// ---------------------------------end experiment --------------------------------------
-      jsPsych.init({
-        timeline: timeline,
-        preload_images: images,
+
+// ---------------------------------store firebase data--------------------------------------
+      function makeid(){
+          var text = "";
+          var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+          for( var i=0; i < 5; i++ )
+              text += possible.charAt(Math.floor(Math.random() * possible.length));
+          return text;
+      };
+
+      var code = makeid();
+
+      function saveToFirebase(code, filedata){
+        var ref = firebase.database().ref(code).set(filedata);
+      };
+
+      var submit_block = {
+        type: 'html-keyboard-response',
+        stimulus: '+',
+        choices: jsPsych.NO_KEYS,
+        trial_duration: 1,
         on_finish: function() {
-          var end_time = new Date();
           var survey_data = jsPsych.data.get().filter([{trial_type: 'survey-html-form'}, {trial_type: 'survey-multi-select'}]).values();
           var subject_data = {
             'subject id': jsPsych.data.get().first(1).values()[0].subject,
@@ -600,7 +616,7 @@
             'phase': 'test2-B1',
             'categorization': test_data_b1.filter({trial_type: 'image-button-response'}).values(),
             'recognition': test_data_b1.filter({trial_type: 'image-slider-response'}).values()
-            };
+          };
           // organize data for test - block 2
           var test_data_b2 = responses.filterCustom(function(x){
             return x.internal_node_id.substring(0, 5) == ("0.0-" + mut_timeline.indexOf('test2_block_2'));
@@ -609,12 +625,10 @@
             'phase': 'test2-B2',
             'categorization': test_data_b2.filter({trial_type: 'image-button-response'}).values(),
             'recognition': test_data_b2.filter({trial_type: 'image-slider-response'}).values()
-            };
+          };
+          var end_time = new Date();
           var duration = ((end_time - start_time) / 60000).toFixed(2);
-          var tmp = new Uint32Array(1);
-          tmp = window.crypto.getRandomValues(tmp);
-          var dbpath = firebase.auth().currentUser.uid+'/'+tmp;
-          firebase.database().ref(dbpath).set({
+          var firebase_data = {
             data: [
               subject_data,
               test_data_b1,
@@ -623,7 +637,64 @@
             study: 'concept learning and episodic memory - S2',
             duration: duration,
             date: Date()
-          });
+            };
+          saveToFirebase(code, firebase_data);
+        }
+      };
+
+      timeline.push(submit_block);
+// ---------------------------------end experiment --------------------------------------
+      jsPsych.init({
+        timeline: timeline,
+        preload_images: images,
+        on_finish: function() {
+          // var end_time = new Date();
+          // var survey_data = jsPsych.data.get().filter([{trial_type: 'survey-html-form'}, {trial_type: 'survey-multi-select'}]).values();
+          // var subject_data = {
+          //   'subject id': jsPsych.data.get().first(1).values()[0].subject,
+          //   'trial sequence': jsPsych.data.get().first(1).values()[0].trial_sequence,
+          //   'block1 image': jsPsych.data.get().first(1).values()[0].img_b1,
+          //   'block2 image': jsPsych.data.get().first(1).values()[0].img_b2,
+          //   'block1 problem': jsPsych.data.get().first(1).values()[0].problem_b1,
+          //   'block2 problem': jsPsych.data.get().first(1).values()[0].problem_b2,
+          // };
+          // for (let x = 0; x < survey_data.length; x++){
+          //   Object.assign(subject_data, JSON.parse(survey_data[x].responses));
+          // };
+          // var responses = jsPsych.data.get().filter([{trial_type: 'image-button-response'}, {trial_type: 'image-slider-response'}]);
+          // // organize data for test - block 1
+          // var test_data_b1 = responses.filterCustom(function(x){
+          //   return x.internal_node_id.substring(0, 5) == ("0.0-" + mut_timeline.indexOf('test2_block_1'));
+          // });
+          // test_data_b1 = {
+          //   'phase': 'test2-B1',
+          //   'categorization': test_data_b1.filter({trial_type: 'image-button-response'}).values(),
+          //   'recognition': test_data_b1.filter({trial_type: 'image-slider-response'}).values()
+          //   };
+          // // organize data for test - block 2
+          // var test_data_b2 = responses.filterCustom(function(x){
+          //   return x.internal_node_id.substring(0, 5) == ("0.0-" + mut_timeline.indexOf('test2_block_2'));
+          // });
+          // test_data_b2 = {
+          //   'phase': 'test2-B2',
+          //   'categorization': test_data_b2.filter({trial_type: 'image-button-response'}).values(),
+          //   'recognition': test_data_b2.filter({trial_type: 'image-slider-response'}).values()
+          //   };
+          // var duration = ((end_time - start_time) / 60000).toFixed(2);
+
+          // var tmp = new Uint32Array(1);
+          // tmp = window.crypto.getRandomValues(tmp);
+          // var dbpath = firebase.auth().currentUser.uid+'/'+tmp;
+          // firebase.database().ref(dbpath).set({
+          //   data: [
+          //     subject_data,
+          //     test_data_b1,
+          //     test_data_b2
+          //   ],
+          //   study: 'concept learning and episodic memory - S2',
+          //   duration: duration,
+          //   date: Date()
+          // });
           alert("please close the window");
         },
         default_iti: 250
