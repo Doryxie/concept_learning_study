@@ -591,9 +591,9 @@
 
       var submit_block = {
         type: 'html-keyboard-response',
-        stimulus: '+',
+        stimulus: '',
         choices: jsPsych.NO_KEYS,
-        trial_duration: 1,
+        trial_duration: 1000,
         on_finish: function() {
           var survey_data = jsPsych.data.get().filter([{trial_type: 'survey-html-form'}, {trial_type: 'survey-multi-select'}]).values();
           var subject_data = {
