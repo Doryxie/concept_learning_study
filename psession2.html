@@ -565,14 +565,13 @@
             </p>'
         };
       
-      timeline.push(draw_general_questions, draw_ethnicity_checkbox, draw_screening_questions, draw_SMHSQ_questions, draw_end_session);
+      timeline.push(draw_general_questions, draw_ethnicity_checkbox, draw_screening_questions, draw_SMHSQ_questions);
 // ---------------------------------debrief--------------------------------------
       var draw_debriefing = {
         type:'external-html',
         url: "debriefing.html",
         cont_btn: "end"
       };
-      timeline.push(draw_debriefing);
 
 // ---------------------------------store firebase data--------------------------------------
       function makeid(){
@@ -636,13 +635,24 @@
             ],
             study: 'concept learning and episodic memory - S2',
             duration: duration,
-            date: Date()
+            date: Date(),
+            repo: '~concept_learning_study'
             };
           saveToFirebase(code, firebase_data);
+          // send data to savejs
+          var xhr = new XMLHttpRequest();
+          xhr.open('POST','https://macklab-savejs.netlify.app/api/savejs');
+          xhr.onload = function(){
+            if(xhr.status == 200){
+              var response = JSON.parse(xhr.responseText);
+              console.log(response.success);
+            };
+          };
+          xhr.send(JSON.stringify(final_data));
         }
       };
 
-      timeline.push(submit_block);
+      timeline.push(submit_block, draw_end_session, draw_debriefing);
 // ---------------------------------end experiment --------------------------------------
       jsPsych.init({
         timeline: timeline,
