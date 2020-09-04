@@ -627,7 +627,7 @@
           };
           var end_time = new Date();
           var duration = ((end_time - start_time) / 60000).toFixed(2);
-          var firebase_data = {
+          var final_data = {
             data: [
               subject_data,
               test_data_b1,
@@ -638,7 +638,7 @@
             date: Date(),
             repo: '~concept_learning_study'
             };
-          saveToFirebase(code, firebase_data);
+          saveToFirebase(code, final_data);
           // send data to savejs
           var xhr = new XMLHttpRequest();
           xhr.open('POST','https://macklab-savejs.netlify.app/api/savejs');
