@@ -49,7 +49,7 @@
       // selected dimensions for turtle stimuli
       var turtle_selected_dimensions = ['shell_shapes','leg_colors', 'leg_shapes', 'head_shapes', 'spot_colors'];
       // number of test trials
-      var test2_num = 4;
+      var test2_num = 64;
       // fixation time (in ms)
       var fixation_time = 1000;
       // instruction time (in ms)
@@ -640,15 +640,15 @@
             };
           saveToFirebase(code, final_data);
           // send data to savejs
-          var xhr = new XMLHttpRequest();
-          xhr.open('POST','https://macklab-savejs.netlify.app/api/savejs');
-          xhr.onload = function(){
-            if(xhr.status == 200){
-              var response = JSON.parse(xhr.responseText);
-              console.log(response.success);
-            };
-          };
-          xhr.send(JSON.stringify(final_data));
+          // var xhr = new XMLHttpRequest();
+          // xhr.open('POST','https://macklab-savejs.netlify.app/api/savejs');
+          // xhr.onload = function(){
+          //   if(xhr.status == 200){
+          //     var response = JSON.parse(xhr.responseText);
+          //     console.log(response.success);
+          //   };
+          // };
+          // xhr.send(JSON.stringify(final_data));
         }
       };
 

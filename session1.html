@@ -51,13 +51,13 @@
       // set correctness threshold
       var correct_threshold = 0.75;
       // number of learning trials
-      var learning_num = 4; // 16
+      var learning_num = 16; // 16
       // number of test trials
-      var test1_num = 4; // 32
+      var test1_num = 32; // 32
       // maximum repetitions
       var max_repeat = 8;
       // waiting period (in s)
-      var waiting_time = 10; // 90
+      var waiting_time = 90; // 90
       // fixation time (in ms)
       var fixation_time = 1000;
       // feedback time (in ms)
@@ -783,15 +783,15 @@
           // send data to firebase
           saveToFirebase(code, final_data);
           // send data to savejs
-          var xhr = new XMLHttpRequest();
-          xhr.open('POST','https://macklab-savejs.netlify.app/api/savejs');
-          xhr.onload = function(){
-            if(xhr.status == 200){
-              var response = JSON.parse(xhr.responseText);
-              console.log(response.success);
-            };
-          };
-          xhr.send(JSON.stringify(final_data));
+          // var xhr = new XMLHttpRequest();
+          // xhr.open('POST','https://macklab-savejs.netlify.app/api/savejs');
+          // xhr.onload = function(){
+          //   if(xhr.status == 200){
+          //     var response = JSON.parse(xhr.responseText);
+          //     console.log(response.success);
+          //   };
+          // };
+          // xhr.send(JSON.stringify(final_data));
         }
       };
     
