@@ -639,17 +639,19 @@
             repo: '~concept_learning_study'
             };
           saveToFirebase(code, final_data);
+
           // send data to savejs
-          // var xhr = new XMLHttpRequest();
-          // xhr.open('POST','https://macklab-savejs.netlify.app/api/savejs');
-          // xhr.onload = function(){
-          //   if(xhr.status == 200){
-          //     var response = JSON.parse(xhr.responseText);
-          //     console.log(response.success);
-          //   };
-          // };
-          // xhr.send(JSON.stringify(final_data));
+          var xhr = new XMLHttpRequest();
+          xhr.open('POST','https://macklab-savejs.netlify.app/api/savejs');
+          xhr.onload = function(){
+            if(xhr.status == 200){
+              var response = JSON.parse(xhr.responseText);
+              console.log(response.success);
+            };
+          };
+          xhr.send(JSON.stringify(final_data));
         }
+        
       };
 
       timeline.push(submit_block, draw_end_session, draw_debriefing);
